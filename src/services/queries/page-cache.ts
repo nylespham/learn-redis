@@ -1,3 +1,19 @@
-export const getCachedPage = (route: string) => {};
+import { client } from "../redis/client";
+import { pageCacheKey } from "$services/keys";
 
-export const setCachedPage = (route: string, page: string) => {};
+const cachedRoutes = ["/about", "/privacy","/auth/signin","/auth/signup"];
+
+export const getCachedPage = (route: string) => {
+    if (cachedRoutes.includes(route)){
+        return client.get(pageCacheKey(route));
+    }
+    return null;
+};
+
+export const setCachedPage = (route: string, page: string) => {
+    if (cachedRoutes.includes(route)){
+        client.set(pageCacheKey(route), page, {
+            EX: 2
+        });
+    }
+};
